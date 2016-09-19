@@ -1,4 +1,3 @@
-special-vendored-path/* linguist-vendored
-Applications/webserver/style/build/* linguist-vendored=false
-Applications/webserver/style/css/* linguist-vendored=false
-Applications/webserver/style/fonts/* linguist-vendored=false
+Applications/webserver/style/build/* linguist-vendored
+Applications/webserver/style/css/* linguist-vendored
+Applications/webserver/style/fonts/* linguist-vendored
