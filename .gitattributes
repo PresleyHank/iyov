@@ -1,0 +1,4 @@
+special-vendored-path/* linguist-vendored
+webserver/style/build/* linguist-vendored=false
+webserver/style/css/* linguist-vendored=false
+webserver/style/fonts/* linguist-vendored=false
