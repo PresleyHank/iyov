@@ -1,4 +1,5 @@
 // websocket
+
 var ws = {
 	init: function() {
 		ws.gateway = new WebSocket('ws://0.0.0.0:4355');
@@ -29,6 +30,10 @@ var ws = {
 					}
 
 					cache.set(id, (url == 'default' ? host : host+'/'+url), data[host][url]);
+
+					if ($("#iyov-content").children().length == 0) {
+						tree.showData(id);
+					}
 				}
 			}
 		}

@@ -78,20 +78,22 @@ var tree = {
 	},
 	addClientListener: function(id) {
 		$("#"+id).bind('click', function() {
-			console.log(id);
-			var data = cache.get(id);
-			var content = '';
-			var item = '';
-			for(var type in data) {
-					if ($.inArray(type, newLineItem) == -1) {
-						item = ' : <span class="item-content">' + data[type] + '</span><br/>';
-					} else {
-						item = ' :<br/> <p class="item-content">' + data[type] + '</p>' + (type == 'RequestBody' ? '<br/><br/>' : '') ;
-					}
-					content = content + '<span class="item-title">' + type + '</span>' + item;
-			}
-			content = content != '' ? content : 'oh~ unexpected error happens...';
-			$("#iyov-content").html(content);
+			tree.showData(id);
 		});
+	},
+	showData: function(id) {
+		var data = cache.get(id);
+		var content = '';
+		var item = '';
+		for(var type in data) {
+			if ($.inArray(type, newLineItem) == -1) {
+				item = ' : <span class="item-content">' + data[type] + '</span><br/>';
+			} else {
+				item = ' :<br/> <p class="item-content">' + data[type] + '</p>' + (type == 'RequestBody' ? '<br/><br/>' : '') ;
+			}
+			content = content + '<span class="item-title">' + type + '</span>' + item;
+		}
+		content = content != '' ? content : 'oh~ unexpected error happens...';
+		$("#iyov-content").html(content);
 	}
 }
