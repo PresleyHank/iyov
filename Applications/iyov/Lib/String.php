@@ -16,4 +16,14 @@ class String {
 
 		return true;
 	}
+
+	public static function formatMicroTime($time)
+	{
+		if (!is_numeric($time)) {
+			return "";
+		}
+
+		$spices = explode(".",  $time);
+		return count($spices) == 1 ? date('Y-m-d h:i:s', $spices[0]) : str_replace("x", $spices[1], date('Y-m-d h:i:s.x', $time));
+	}
 }

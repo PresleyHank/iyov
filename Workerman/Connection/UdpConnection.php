@@ -68,7 +68,7 @@ class UdpConnection extends ConnectionInterface
                 return null;
             }
         }
-        return strlen($send_buffer) === stream_socket_sendto($this->_socket, $send_buffer, 0); //, $this->_remoteAddress
+        return strlen($send_buffer) === stream_socket_sendto($this->_socket, $send_buffer, 0, $this->_remoteAddress); 
     }
 
     /**

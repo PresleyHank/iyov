@@ -523,16 +523,11 @@ class TcpConnection extends ConnectionInterface
         $source              = $this;
         $this->onMessage     = function ($source, $data) use ($dest) {
             $dest->send($data);
-            // 数据统计回调
-            if ($source->onMessageCapture) {
-                call_user_func($source->onMessageCapture, $data);
-            }
+            // echo $data."\n";
+            call_user_func($source->onMessageCapture, $data);
         };
         $this->onClose       = function ($source) use ($dest) {
             $dest->destroy();
-            if ($source->onCloseCapture) {
-                call_user_func($source->onCloseCapture);
-            }
         };
         $dest->onBufferFull  = function ($dest) use ($source) {
             $source->pauseRecv();

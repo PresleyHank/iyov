@@ -6,11 +6,11 @@ var cache = {
 		if (data[id] == undefined) {
 			data[id] = {};
 		}
-		if (content.hasOwnProperty('Query')) {
+		if (content['Query'] != "") {
 			url = url + '?' + content['Query'];
 			delete content.Query;
 		}
-		data[id]['Url'] = url;
+		data[id]['Url'] = !data[id].hasOwnProperty('Url') ? url : data[id]['Url'];
 		for(var index in content) {
 			data[id][index] = content[index];
 		}

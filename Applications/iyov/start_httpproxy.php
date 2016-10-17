@@ -4,7 +4,7 @@ use \Workerman\Worker;
 use \Workerman\Lib\Timer;
 use \Workerman\Connection\AsyncTcpConnection;
 use \Workerman\Autoloader;
-use \Workerman\Protocols\Http;
+use \Applications\iyov\Lib\Http;
 use \Applications\iyov\HttpProxy;
 // 自动加载类
 require_once __DIR__ . '/../../Workerman/Autoloader.php';
@@ -24,15 +24,17 @@ $httproxy_worker->onWorkerStart = function() {
 };
 
 $httproxy_worker->onConnect = function($connection) {
-	echo "connected\n";
-	HttpProxy::Instance($connection);
+	HttpProxy::Instance($connection)->initClientCapture();
 };
 
 $httproxy_worker->onMessage = function($connection, $buffer) {
-	// echo "$buffer\n";
-	HttpProxy::Instance($connection)->process($buffer);
-};
+	if (!HttpProxy::Instance($connection)->asyncConnection) {
+		HttpProxy::Instance($connection)->data .= $buffer;
+		if (!($length = Http::input(HttpProxy::Instance($connection)->data))) {
+			return ;
+		}
 
-$httproxy_worker->onWorkerStop = function() {
-	
+		HttpProxy::Instance($connection)->requestProcess(HttpProxy::Instance($connection)->data);
+		HttpProxy::Instance($connection)->data = '';
+	}
 };

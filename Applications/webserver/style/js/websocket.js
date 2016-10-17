@@ -8,31 +8,37 @@ var ws = {
 			if (event.data == "") {
 				return ;
 			}
-			var data = eval('(' + event.data + ')');
-			console.log(data);
+			var package = eval('(' + event.data + ')');
+			console.log(package);
 			var hashHost ;
-			for (var host in data) {
-				hashHost = hash(host);
-				if (host == 'http://iyov.io:8080' || host == '0.0.0.0:4355') {
-					continue;
-				}
-				if (!tree.exists(hashHost)) {
-					tree.createNode('root', hashHost, host, false);
-				}
-				for (var url in data[host]) {
-					if (data[host][url].hasOwnProperty('Path') && path(data[host][url]['Path'])) {
-						parseUrl(host, data[host][url]);
+			var data;
+			for(var time in package) {
+				for (var host in package[time]) {
+					data = package[time];
+					hashHost = hash(host);
+					if (host == 'http://iyov.io:8080' || host == '0.0.0.0:4355') {
 						continue;
 					}
-					var id = hash(url + '_t_' +data[host][url]['StartTime']);
-					if (!tree.exists(id)) {
-						tree.createNode(hashHost, id, url, true);
+					if (!tree.exists(hashHost)) {
+						tree.createNode('root', hashHost, host, false);
 					}
-
-					cache.set(id, (url == 'default' ? host : host+'/'+url), data[host][url]);
-
-					if ($("#iyov-content").children().length == 0) {
-						tree.showData(id);
+					var id;
+					var holeUrl;
+					for (var url in data[host]) {
+						holeUrl = url == 'default' ? host : host+'/'+url;
+						id = hash(holeUrl + '_t_' + time);
+						console.log(holeUrl + '_t_' +time);
+						cache.set(id,  holeUrl, data[host][url]);
+						if ($("#iyov-content").children().length == 0) {
+							tree.showData(id);
+						}
+						if (data[host][url].hasOwnProperty('Path') && path(data[host][url]['Path'])) {
+							parseUrl(host, data[host][url], time);
+							continue;
+						}
+						if (!tree.exists(id)) {
+							tree.createNode(hashHost, id, url, true);
+						}
 					}
 				}
 			}
@@ -61,9 +67,8 @@ function path(path) {
 /**
  * 添加路径
  */
-function parseUrl(parent, data) {
+function parseUrl(parent, data, starttime) {
 	var path = data['Path'];
-	var starttime = data['StartTime'];
 	var spices = path.split('/');
 	var leaf = true;
 	for (var index in spices) {
@@ -72,7 +77,7 @@ function parseUrl(parent, data) {
 			continue;
 		}
 		var url = parent + '/' + spices[index];
-		var id = (spices.length == parseInt(index) + 1) ? url + starttime : url;
+		var id = (spices.length == parseInt(index) + 1) ? url + '_t_' + starttime : url;
 		var hashId = hash(id);
 		var hashParentId = hash(parent);
 		if (tree.exists(hashId)) {
@@ -85,7 +90,7 @@ function parseUrl(parent, data) {
 			tree.insertBefore(hashParentId, hashId, spices[index], leaf);
 		} else {
 			tree.createNode(hashParentId, hashId, spices[index], leaf);
-			cache.set(hashId, url, data);
+			// cache.set(hashId, url, data);
 		}
 		parent = id;
 	}

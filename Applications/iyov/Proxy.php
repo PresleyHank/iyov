@@ -2,7 +2,7 @@
 namespace Applications\iyov;
 
 use \Workerman\Connection\AsyncTcpConnection;
-use \Workerman\Connection\UdpConnection;
+use \Workerman\Connection\TcpConnection;
 use \Workerman\Protocols\Http;
 
 
@@ -12,13 +12,17 @@ use \Workerman\Protocols\Http;
 class Proxy {
 
 	/**
+	 *
+	 */
+	public $filterHost = array('0.0.0.0:4355','iyov.io:8080');
+	/**
 	 * udp address
 	 */
-	static $udpAddr = 'udp://0.0.0.0:9388';
+	static $udpAddr = 'tcp://0.0.0.0:9388';
 	/**
 	 * 到统计进程的socket
 	 */
-	protected static $udpConnection = null;
+	protected static $innerConnection = null;
 
 	/**
 	 * 链接实例
@@ -66,9 +70,9 @@ class Proxy {
 
 	public static function init()
 	{
-		$stream = stream_socket_client('udp://0.0.0.0:9388');
+		$stream = stream_socket_client('tcp://0.0.0.0:9388');
 
-		static::$udpConnection = new UdpConnection($stream, static::$udpConnection);
+		static::$innerConnection = new TcpConnection($stream, static::$innerConnection);
 	}
 
 	public static function instance($connection)
@@ -81,8 +85,9 @@ class Proxy {
 		return static::$instances[$connection->id];
 	}
 
-	protected function unsetInstance($connection)
+	public static function unsetInstance($connection)
 	{
+		static::$instances[$connection->id]->AsyncTcpConnection->close();
 		unset(static::$instances[$connection->id]);
 	}
 
@@ -91,7 +96,7 @@ class Proxy {
 	 */
 	public static function Broadcast()
 	{
-		static::$udpConnection->send(json_encode(static::$statisticData));
+		static::$innerConnection->send(json_encode(static::$statisticData));
 		static::$statisticData = array();
 	}
 
@@ -100,4 +105,12 @@ class Proxy {
 	 * @param string $data
 	 */
 	protected function decode($data) {}
+
+	/**
+	 * 过滤掉不统计的域名信息
+	 */
+	public function filter($host)
+	{
+		return in_array($host, $this->filterHost);
+	}
 }

@@ -19,7 +19,7 @@ class Gateway {
 	public static function init($worker)
 	{
 		static::$gatewayworker = $worker;
-		static::$internalWorker = new Worker('udp://0.0.0.0:9388');
+		static::$internalWorker = new Worker('tcp://0.0.0.0:9388');
 		static::$internalWorker->onMessage = function($connection,$data) {
 			Gateway::broad($data);
 		};
@@ -32,7 +32,6 @@ class Gateway {
 		if (empty(static::$gatewayworker->connections)) {
 			return ;
 		}
-
 		foreach(static::$gatewayworker->connections as $connection) {
 			$connection->send($data);
 		}

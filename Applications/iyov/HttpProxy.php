@@ -14,14 +14,9 @@ use \Workerman\Connection\AsyncTcpConnection;
 class HttpProxy extends Proxy {
 
 	/**
-	 * Max length of body(bytes)
+	 * Accect Content Type
 	 */
-	const MAX_BODY_LENGTH = 3072;
-
-	/**
-	 * Max udp lengtg(65537)
-	 */
-	const MAX_UDP_LENGTH = 64000;
+	private $acceptedContentType = array('text/html','text/xml', 'application/json');
 
 	/**
 	 * data
@@ -82,25 +77,20 @@ class HttpProxy extends Proxy {
 	 * Host with protocol prefix
 	 */
 	public $entityHost;
+
+	public $requestSize = 0;
+	public $responseSize = 0;
+	public $responseCode = '';
+
 	/**
 	 * Http request body
 	 */
-	public $requestBody = 'nil';
+	public $requestBody;
 
 	/**
 	 * Http response body
 	 */
-	public $responseBody = 'nil';
-
-	/**
-	 * Http response status
-	 */
-	public $status;
-
-	/**
-	 * Http resonse message
-	 */
-	public $message;
+	public $responseBody;
 
 	/**
 	 * Http request path
@@ -120,7 +110,6 @@ class HttpProxy extends Proxy {
 	public function __construct()
 	{
 		$this->protocol = 'Http';
-		$this->startTime =  !$this->startTime ? microtime(true) : $this->startTime;
 	}
 
 	/**
@@ -128,63 +117,83 @@ class HttpProxy extends Proxy {
 	*
 	* @param string $buffer 客户端发来的第一个包
 	*/
-	public function process($data)
+	public function requestProcess($request)
 	{
-		$this->data .= $data;
-		echo $data."\n";
-		if (!($length = Http::input($this->data))) {
+		$this->startTime =  microtime(true);
+		$this->startTimeString = sprintf("%s", $this->startTime);
+		$this->requestSize = strlen($request);
+		$this->requestDecode($request);
+		if (!$this->asyncConnection) {
+			// 建议与目标服务器的异步连接
+			$this->initRemoteConnection();
+			$this->pipe($request);
+		}
+		// 解析请求数据
+		if ($this->filter("{$this->host}:{$this->port}")) {
 			return ;
 		}
-		$this->request = substr($this->data, 0, $length);
-		$this->data = substr($this->data, $length, strlen($this->data));
-		// 解析请求数据
 		$this->requestStatistic();
-
-		if (!$this->asyncConnection) {
-			// 初始化目标服务器，异步链接
-			$this->initAsyncConection();
-
-			// 建立客户端和目标服务器的管道
-			$this->pipe();
-		}
 	}
 
-	public function initAsyncConection()
+	public function responseProcess($response)
+	{
+		$this->responseStartTime = !$this->responseStartTime ? microtime(true) : $this->responseStartTime;
+		$this->responseSize = strlen($response);
+		$this->responseDecode($response);
+		$this->responseStatistic();
+	}
+
+	public function initRemoteConnection()
 	{
 		//  初始化异步链接，并建立通信管道
     	$this->asyncConnection = new AsyncTcpConnection("tcp://{$this->host}:{$this->port}");
 
-    	// 设置目标服务器数据捕获回调
-    	$proxy = $this;
-		$this->asyncConnection->onMessageCapture = function($data) use (&$proxy) {
-			// 缓存Response数据，因为代理链接时tcp的，http的数据实际时字符串，在网络中可能被拆包了
-			$proxy->responseStartTime = !$proxy->responseStartTime ? microtime(true) : $proxy->responseStartTime;
-			$proxy->response .= $data;
-			if (!Http::output($proxy->response)) {
+    	// 建立管道
+		$this->asyncConnection->pipe($this->connection);
+		$this->connection->pipe($this->asyncConnection);
+  		$this->initRemoteCapture();
+		// 链接至目标服务器
+		$this->asyncConnection->connect();
+	}
+
+	public function initClientCapture()
+	{
+		$proxy = $this;
+		$this->connection->onMessageCapture = function($data) use ($proxy) {
+    		$proxy->data .= $data;
+			if (!($length = Http::input($proxy->data))) {
 				return ;
 			}
-			
-			// 解析统计response数据
-			$proxy->responseStatistic();
-			$proxy->response = '';
-			$proxy->responseStartTime = 0;
+
+			$request = substr($this->data, 0, $length);
+			$this->data = substr($this->data, $length, strlen($this->data));
+			$proxy->requestProcess($request);
+    	};
+	}
+	
+	public function initRemoteCapture()
+	{
+    	$proxy = $this;
+		$this->asyncConnection->onMessageCapture = function($data) use (&$proxy) {
+			$proxy->response .= $data;
+			if (!($length = Http::output($proxy->response))) {
+				return ;
+			}
+			$response = substr($proxy->response, 0,$length);
+			$proxy->response = substr($proxy->response, $length, strlen($proxy->data));
+			$proxy->responseProcess($response);
 		};
 	}
 
-	public function pipe()
+	public function pipe($data)
 	{
 		if (strcmp($this->method,'CONNECT') === 0) {
 			// HTTPS
-    		$this->connection->send("HTTP/1.1 200 Connection Established\r\n\r\n");
-    	} else {
-    		// HTTP
-			$this->asyncConnection->send($this->request);
+    		return $this->connection->send("HTTP/1.1 200 Connection Established\r\n\r\n");
     	}
-     	// 建立管道
-		$this->asyncConnection->pipe($this->connection);
-		$this->connection->pipe($this->asyncConnection);
-		// 链接至目标服务器
-		$this->asyncConnection->connect();
+    	// HTTP
+		return $this->asyncConnection->send($data);
+     	
 	}
 
 	/**
@@ -193,11 +202,12 @@ class HttpProxy extends Proxy {
 	protected function requestDecode($data)
 	{
 		list($this->requestHeader, $body) = explode("\r\n\r\n", $data, 2);
-		$this->requestBody = !$body ? $this->requestBody : ($body < self::MAX_BODY_LENGTH ? $body : $this->requestBody);
+		$this->requestBody = !$body ? '[unknown]' : $body;
 		list($firstLine, $this->requestHeader) = explode("\r\n", $this->requestHeader, 2);
 		$this->requestHeader = str_replace("\r\n", "<br />", $this->requestHeader);
 
-		return $firstLine;
+		list($this->method, $url, $this->protocol) = explode(" ", $firstLine);
+		$this->urlComponents($url);
 	}
 
 	/**
@@ -206,11 +216,12 @@ class HttpProxy extends Proxy {
 	protected function responseDecode($data)
 	{
 		list($this->responseHeader, $body) = explode("\r\n\r\n", $data, 2);
-		$this->responseBody = !$body ? $this->responseBody : ($body < self::MAX_BODY_LENGTH ? $body : $this->responseBody);
 		list($firstLine, $this->responseHeader) = explode("\r\n", $this->responseHeader, 2);
-		$this->responseHeader = str_replace("\r\n", "<br />", $this->responseHeader);
+		list(, $status, $message) = explode(" ", $firstLine, 3);
 
-		return $firstLine;
+		$this->responseCode = "$status [ $message ]";
+		$this->responseBody = $this->validBody($this->responseHeader) ? ($body ? $body : '[unknown]') : '[unknown]';
+		$this->responseHeader = str_replace("\r\n", "<br />", $this->responseHeader);
 	}
 
 	/**
@@ -218,30 +229,21 @@ class HttpProxy extends Proxy {
 	 */
 	protected function requestStatistic()
 	{
-		$requestLine = $this->requestDecode($this->request);
-		// 解析请求头部信息
-		list($this->method, $url, $this->protocol) = explode(" ", $requestLine);
-		echo "Request: " . $url . "\n";
-		$this->urlComponents($url);
-		
-		if (!isset(static::$statisticData[$this->entityHost])) {
-			static::$statisticData[$this->entityHost] = array();
+		if (!isset(static::$statisticData[$this->startTimeString])) {
+			static::$statisticData[$this->startTimeString] = array();
 		}
 
-		static::$statisticData[$this->entityHost][$this->url] = array(
-			'Path' => $this->path,
-			'Method' => $this->method,
-			'Protocol' => $this->protocol,
-			'ClientIP' => $this->connection->getRemoteIp(),
-			'RequestSize' => strlen($this->request),
-			'StartTime' => $this->startTime,
+		static::$statisticData[$this->startTimeString][$this->entityHost][$this->url] = array(
+			'Path'          => $this->path,
+			'Method'        => $this->method,
+			'Query'         => $this->query,
+			'Protocol'      => $this->protocol,
+			'ClientIP'      => $this->connection->getRemoteIp(),
+			'RequestSize'   => $this->requestSize,
+			'StartTime'     => String::formatMicroTime($this->startTime),
 			'RequestHeader' => $this->requestHeader,
-			// 'scheme'=> $this->scheme,
-			'RequestBody' => $this->requestBody
+			'RequestBody'   => $this->requestBody
 			);
-		if ($this->query) {
-			static::$statisticData[$this->entityHost][$this->url]['Query'] = $this->query;
-		}
 	}
 
 	/**
@@ -249,21 +251,15 @@ class HttpProxy extends Proxy {
 	 */
 	protected function responseStatistic()
 	{
-		echo "Response: ".$this->url."\n";
-		$responseLine = $this->responseDecode($this->response);
 		
-		static::$statisticData[$this->entityHost][$this->url]['Path'] = $this->path;
-		static::$statisticData[$this->entityHost][$this->url]['StartTime'] = $this->startTime;
-		static::$statisticData[$this->entityHost][$this->url]['EndTime'] = microtime(true);
-		static::$statisticData[$this->entityHost][$this->url]['ServerIP'] = $this->asyncConnection->getRemoteIp();
-		static::$statisticData[$this->entityHost][$this->url]['ResponseSize'] = strlen($this->response);
-		if ($responseLine) {
-			// 不是资源文件，解析响应头部信息
-			list(, $this->status, $this->message) = explode(" ", $responseLine, 3);
-			static::$statisticData[$this->entityHost][$this->url]['RessponseCode'] = "$this->status [ $this->message ]";
-			static::$statisticData[$this->entityHost][$this->url]['ResponseHeader'] = $this->responseHeader;
-			// static::$statisticData[$this->entityHost][$this->url]['ResponseBody'] = $this->responseBody;
-		}
+		static::$statisticData[$this->startTimeString][$this->entityHost][$this->url]['Path'] = $this->path;
+		static::$statisticData[$this->startTimeString][$this->entityHost][$this->url]['StartTime'] = String::formatMicroTime($this->startTime);
+		static::$statisticData[$this->startTimeString][$this->entityHost][$this->url]['EndTime'] = String::formatMicroTime(microtime(true));
+		static::$statisticData[$this->startTimeString][$this->entityHost][$this->url]['ServerIP'] = $this->asyncConnection->getRemoteIp();
+		static::$statisticData[$this->startTimeString][$this->entityHost][$this->url]['ResponseSize'] = $this->responseSize;
+		static::$statisticData[$this->startTimeString][$this->entityHost][$this->url]['ResponseCode'] = $this->responseCode;
+		static::$statisticData[$this->startTimeString][$this->entityHost][$this->url]['ResponseHeader'] = $this->responseHeader;
+		static::$statisticData[$this->startTimeString][$this->entityHost][$this->url]['ResponseBody'] = $this->responseBody;
 	}
 
 	public function urlComponents($url)
@@ -279,21 +275,23 @@ class HttpProxy extends Proxy {
 		$this->url = $this->path == '/' ? 'default' : substr($this->path, 1, strlen($this->path));
 	}
 
-	/**
-	 * 将数据发送给统计进程
-	 */
-	public static function Broadcast()
+	protected function validBody($header)
 	{
-		$data = array();
-		$length = 0;
-		foreach(static::$statisticData as $host => $urlData) {
-			if ($length + strlen(json_encode($urlData)) > self::MAX_UDP_LENGTH) {
-				break;
-			}
-			$data[$host] = $urlData;
-			$length += strlen(json_encode($urlData));
-			unset(static::$statisticData[$host]);
+		return $this->validContentEncoding($header) & $this->validContentType($header);
+	}
+
+	protected function validContentEncoding($header)
+	{
+		return !Http::contentEncoding($header);
+	}
+
+	protected function validContentType($header)
+	{
+		$contentType = Http::contentType($header);
+		if (!$contentType || !in_array($contentType, $this->acceptedContentType)) {
+			return false;
 		}
-		static::$udpConnection->send(json_encode($data));
+
+		return true;
 	}
 }
