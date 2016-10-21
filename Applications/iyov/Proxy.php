@@ -96,7 +96,7 @@ class Proxy {
 	 */
 	public static function Broadcast()
 	{
-		static::$innerConnection->send(json_encode(static::$statisticData));
+		static::$innerConnection->send(json_encode(static::$statisticData)); //JSON_UNESCAPED_SLASHES|
 		static::$statisticData = array();
 	}
 

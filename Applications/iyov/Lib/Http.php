@@ -6,6 +6,11 @@ namespace Applications\iyov\Lib;
  */
 class Http {
 	/**
+	 *
+	 */
+	public static $supportCharset = array('UTF-8','GBK');
+	
+	/**
 	 * 检验请求包是否完整
 	 */
 	public static function input($data)
@@ -40,21 +45,25 @@ class Http {
 			return 0;
 		}
 
-		list($header, $body) = explode("\r\n\r\n", $data);
-		if (preg_match("/\r\nContent-Length: ?(\d+)/i", $header, $match)) {
-			$contentLength = $match[1];
-			if ($contentLength <= strlen($body)) {
-				return strlen($header) + 4 + $contentLength;
-			}
-			return 0;
-		} else if (FALSE !== strpos($header, 'Transfer-Encoding: chunked')) {
+		list($header, $body) = explode("\r\n\r\n", $data, 2);
+		if (FALSE !== strpos($header, 'Transfer-Encoding: chunked')) {
+			// echo "\nchunked\n";
 			$spices = explode("\r\n", $body);
 			if (count($spices) < 3 && count($spices) % 2 != 1) {
 				// 最少包涵三个部分
 				return 0;
 			}
 			return array_pop($spices) != 0 ? 0 : strlen($header) + 4 + strlen($body);
+		} else if (preg_match("/\r\nContent-Length: ?(\d+)/i", $header, $match)) {
+			// echo "find contentLength\n";
+			$contentLength = $match[1];
+			// echo "{$contentLength} => ".strlen($body)."\n";
+			if ($contentLength <= strlen($body)) {
+				return strlen($header) + 4 + $contentLength;
+			}
+			return 0;
 		}
+		// echo "\njust header\n";
         return strlen($header) + 4;
 		
 	}
@@ -67,10 +76,9 @@ class Http {
 	 */
 	public static function contentType($header = '')
 	{
-		if (preg_match("/Content-Type: \S+\s*\S*\r\n/", $header, $match)) {
-			$spices = explode(" ", $match[0]);
-			$spices = explode(";", $spices[1]);
-			return $spices[0];
+		if (preg_match("/(?<=Content-Type: )\S+[\s]*[\w=-]*(?=\r\n)/", $header, $match)) {
+			$spices = explode(";", $match[0]);
+			return array_shift($spices);
 		}
 
 		return "";

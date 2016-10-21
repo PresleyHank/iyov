@@ -164,7 +164,6 @@ class HttpProxy extends Proxy {
 			if (!($length = Http::input($proxy->data))) {
 				return ;
 			}
-
 			$request = substr($this->data, 0, $length);
 			$this->data = substr($this->data, $length, strlen($this->data));
 			$proxy->requestProcess($request);
@@ -202,7 +201,7 @@ class HttpProxy extends Proxy {
 	protected function requestDecode($data)
 	{
 		list($this->requestHeader, $body) = explode("\r\n\r\n", $data, 2);
-		$this->requestBody = !$body ? '[unknown]' : $body;
+		$this->requestBody = !$body ? '' : $body;
 		list($firstLine, $this->requestHeader) = explode("\r\n", $this->requestHeader, 2);
 		$this->requestHeader = str_replace("\r\n", "<br />", $this->requestHeader);
 
@@ -220,7 +219,7 @@ class HttpProxy extends Proxy {
 		list(, $status, $message) = explode(" ", $firstLine, 3);
 
 		$this->responseCode = "$status [ $message ]";
-		$this->responseBody = $this->validBody($this->responseHeader) ? ($body ? $body : '[unknown]') : '[unknown]';
+		$this->responseBody = $this->getBody($body);
 		$this->responseHeader = str_replace("\r\n", "<br />", $this->responseHeader);
 	}
 
@@ -275,10 +274,21 @@ class HttpProxy extends Proxy {
 		$this->url = $this->path == '/' ? 'default' : substr($this->path, 1, strlen($this->path));
 	}
 
+	protected function getBody($body)
+	{
+		if (!$this->validBody($this->responseHeader)) {
+			return '[unknown]';
+		}
+
+		return stripslashes(mb_convert_encoding($body, 'UTF-8', Http::$supportCharset));
+	}
+
 	protected function validBody($header)
 	{
 		return $this->validContentEncoding($header) & $this->validContentType($header);
 	}
+
+	
 
 	protected function validContentEncoding($header)
 	{
