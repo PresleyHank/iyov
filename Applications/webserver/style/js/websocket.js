@@ -27,7 +27,6 @@ var ws = {
 					for (var url in data[host]) {
 						holeUrl = url == 'default' ? host : host+'/'+url;
 						id = hash(holeUrl + '_t_' + time);
-						console.log(holeUrl + '_t_' +time);
 						cache.set(id,  holeUrl, data[host][url]);
 						if ($("#iyov-content").children().length == 0) {
 							tree.showData(id);

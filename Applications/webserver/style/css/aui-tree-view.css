@@ -140,10 +140,14 @@
 }
 #iyov-content > textarea {
 	width: 98%;
-	height: 350px;
 	font-size: 12px;
     background-color: ghostwhite;
     border: none;
+    visibility: hidden;
+}
+#iyov-content > textarea[class="not-empty"] {
+	height: 350px;
+	visibility: visible;
 }
 .item-content {
 	margin-bottom: 0px;
