@@ -3,7 +3,7 @@
 > HTTP 代理以及抓包工具
 
 * Gateway 对外websocket服务
-* HttpProxy Http代理服务类，以及发送统计数据到Gateway进程，`UDP`协议
+* HttpProxy Http代理服务类，以及发送统计数据到Gateway进程，`TCP`协议
 * Proxy 代理基础类
 * Lib/Http Http 工具类
 * Lib/String 字符串工具类
@@ -15,13 +15,13 @@
 * 统计数据结构可能造成信息被覆盖BUG;
 * 客户端第一个HTTP包可能没处理BUG;
 * 支持`Transfer-Encoding`字段;
+* 支持代理服务多进程；
 
-### 目前已经实现可以Http代理和抓包但是存在以下问题
+### 目前已经实现Http代理和抓包，但是存在以下问题
 1. 接受到客户端完整请求后再代理服务再请求目标服务器，存在性能不优情况;
-2. 代理服务多进程支持;
-3. 代码冗余，比如统计函数可以放到Http工具类里面;
-4. 仅支持HTTP协议;
-5. 暂不支持`Content-Encoding`字段
+2. 代码冗余，比如统计函数可以放到Http工具类里面;
+3. 仅支持HTTP协议;
+4. 暂不支持`Content-Encoding`字段
 
 ### 安装
 * 克隆仓库，并把根目录重命名为Applications(Workerman 服务要求的，启动脚本只加载Applications下的启动文件)；
