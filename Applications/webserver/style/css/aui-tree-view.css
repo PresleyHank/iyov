@@ -138,6 +138,13 @@
     padding-left: 15px;
     padding-bottom: 15px;
 }
+#iyov-content > textarea {
+	width: 98%;
+	height: 350px;
+	font-size: 12px;
+    background-color: ghostwhite;
+    border: none;
+}
 .item-content {
 	margin-bottom: 0px;
     margin-left: 20px;

@@ -87,9 +87,11 @@ var tree = {
 		var item = '';
 		for(var type in data) {
 			if ($.inArray(type, newLineItem) == -1) {
-				item = ' : <span class="item-content">' + data[type] + '</span><br/>';
+				item = ' :<span class="item-content">' + data[type] + '</span><br/>';
+			} else if (type == 'ResponseBody') {
+				item = ' :<br/><br/><textarea readonly>' + data[type] + '</textarea>';
 			} else {
-				item = ' :<br/> <p class="item-content">' + data[type] + '</p>' + (type == 'RequestBody' ? '<br/><br/>' : '') ;
+				item = ' :<br/> <p class="item-content">' + data[type] + '</p>';
 			}
 			content = content + '<span class="item-title">' + type + '</span>' + item;
 		}
