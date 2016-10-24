@@ -3,6 +3,7 @@
 use \Workerman\Worker;
 use \Workerman\Autoloader;
 use \Applications\iyov\Gateway;
+use \Workerman\Lib\Timer;
 
 // 自动加载类
 require_once __DIR__ . '/../../Workerman/Autoloader.php';
@@ -14,6 +15,6 @@ $gateway_worker->name = 'iyov-gateway';
 
 $gateway_worker->count = 1;
 
-$gateway_worker->onWorkerStart = function() use ($gateway_worker) {
+$gateway_worker->onWorkerStart = function($gateway_worker) {
 	Gateway::init($gateway_worker);
 };

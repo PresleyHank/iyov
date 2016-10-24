@@ -3,6 +3,7 @@ namespace Applications\iyov;
 
 use \Workerman\Worker;
 use \Workerman\Connection\UdpConnection;
+use \Workerman\Lib\Timer;
 
 class Gateway {
 
@@ -12,6 +13,11 @@ class Gateway {
 	static $internalWorker = null;
 
 	/**
+	 * 统计数据
+	 */
+	public static $globalData = array();
+
+	/**
 	 * gatewayworker
 	 */
 	public static $gatewayworker = array();
@@ -19,21 +25,29 @@ class Gateway {
 	public static function init($worker)
 	{
 		static::$gatewayworker = $worker;
-		static::$internalWorker = new Worker('tcp://0.0.0.0:9388');
-		static::$internalWorker->onMessage = function($connection,$data) {
-			Gateway::broad($data);
-		};
-		static::$internalWorker->listen();
-		static::$internalWorker->run();
+		Timer::add(1, array('\Applications\iyov\Gateway', 'broad'), array(), true);
+		self::initInternalWorker();
 	}
 
-	public static function broad($data)
+	public static function broad()
 	{
 		if (empty(static::$gatewayworker->connections)) {
 			return ;
 		}
 		foreach(static::$gatewayworker->connections as $connection) {
-			$connection->send($data);
+			$connection->send(json_encode(self::$globalData));
 		}
+		self::$globalData = array();
+	}
+
+	protected static function initInternalWorker()
+	{
+		static::$internalWorker = new Worker('tcp://0.0.0.0:9388');
+		static::$internalWorker->onMessage = function($connection,$data) {
+			$data = json_decode($data, true);
+			self::$globalData = array_merge(self::$globalData, $data);
+		};
+		static::$internalWorker->listen();
+		static::$internalWorker->run();
 	}
 }

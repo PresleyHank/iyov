@@ -17,12 +17,6 @@
 * 支持`Transfer-Encoding`字段;
 * 支持代理服务多进程；
 
-### 目前已经实现Http代理和抓包，但是存在以下问题
-1. 接受到客户端完整请求后再代理服务再请求目标服务器，存在性能不优情况;
-2. 代码冗余，比如统计函数可以放到Http工具类里面;
-3. 仅支持HTTP协议;
-4. 暂不支持`Content-Encoding`字段
-
 ### 安装
 * 克隆仓库，并把根目录重命名为Applications(Workerman 服务要求的，启动脚本只加载Applications下的启动文件)；
 * 在Applications同级目录下克隆Workerman源码；
