@@ -120,7 +120,7 @@ class HttpProxy extends Proxy {
 	public function requestProcess($request)
 	{
 		$this->startTime =  microtime(true);
-		$this->startTimeString = sprintf("%s", $this->startTime);
+		$this->startTimeInt = (int)str_replace('.', '', $this->startTime);
 		$this->requestSize = strlen($request);
 		$this->requestDecode($request);
 		if (!$this->asyncConnection) {
@@ -228,11 +228,11 @@ class HttpProxy extends Proxy {
 	 */
 	protected function requestStatistic()
 	{
-		if (!isset(static::$statisticData[$this->startTimeString])) {
-			static::$statisticData[$this->startTimeString] = array();
+		if (!isset(static::$statisticData[$this->startTimeInt])) {
+			static::$statisticData[$this->startTimeInt] = array();
 		}
 
-		static::$statisticData[$this->startTimeString][$this->entityHost][$this->url] = array(
+		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url] = array(
 			'Path'          => $this->path,
 			'Method'        => $this->method,
 			'Query'         => $this->query,
@@ -251,14 +251,14 @@ class HttpProxy extends Proxy {
 	protected function responseStatistic()
 	{
 		
-		static::$statisticData[$this->startTimeString][$this->entityHost][$this->url]['Path'] = $this->path;
-		static::$statisticData[$this->startTimeString][$this->entityHost][$this->url]['StartTime'] = String::formatMicroTime($this->startTime);
-		static::$statisticData[$this->startTimeString][$this->entityHost][$this->url]['EndTime'] = String::formatMicroTime(microtime(true));
-		static::$statisticData[$this->startTimeString][$this->entityHost][$this->url]['ServerIP'] = $this->asyncConnection->getRemoteIp();
-		static::$statisticData[$this->startTimeString][$this->entityHost][$this->url]['ResponseSize'] = $this->responseSize;
-		static::$statisticData[$this->startTimeString][$this->entityHost][$this->url]['ResponseCode'] = $this->responseCode;
-		static::$statisticData[$this->startTimeString][$this->entityHost][$this->url]['ResponseHeader'] = $this->responseHeader;
-		static::$statisticData[$this->startTimeString][$this->entityHost][$this->url]['ResponseBody'] = $this->responseBody;
+		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['Path'] = $this->path;
+		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['StartTime'] = String::formatMicroTime($this->startTime);
+		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['EndTime'] = String::formatMicroTime(microtime(true));
+		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ServerIP'] = $this->asyncConnection->getRemoteIp();
+		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ResponseSize'] = $this->responseSize;
+		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ResponseCode'] = $this->responseCode;
+		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ResponseHeader'] = $this->responseHeader;
+		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ResponseBody'] = $this->responseBody;
 	}
 
 	public function urlComponents($url)

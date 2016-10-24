@@ -96,6 +96,8 @@ class Proxy {
 	 */
 	public static function Broadcast()
 	{
+		// 按时间排序
+		ksort(static::$statisticData);
 		static::$innerConnection->send(json_encode(static::$statisticData)); //JSON_UNESCAPED_SLASHES|
 		static::$statisticData = array();
 	}

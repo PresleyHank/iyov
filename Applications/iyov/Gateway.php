@@ -45,7 +45,10 @@ class Gateway {
 		static::$internalWorker = new Worker('tcp://0.0.0.0:9388');
 		static::$internalWorker->onMessage = function($connection,$data) {
 			$data = json_decode($data, true);
-			self::$globalData = array_merge(self::$globalData, $data);
+			if (empty($data)) {
+				return ;
+			}
+			self::$globalData = self::$globalData + $data;
 		};
 		static::$internalWorker->listen();
 		static::$internalWorker->run();
