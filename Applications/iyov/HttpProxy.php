@@ -228,16 +228,16 @@ class HttpProxy extends Proxy {
 	 */
 	protected function requestStatistic()
 	{
-		if (!isset(static::$statisticData[$this->startTimeInt])) {
-			static::$statisticData[$this->startTimeInt] = array();
+		if (!isset(static::$statisticData[$this->getClientIp()])) {
+			static::$statisticData[$this->getClientIp()] = array();
 		}
 
-		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url] = array(
+		static::$statisticData[$this->getClientIp()][$this->startTimeInt][$this->entityHost][$this->url] = array(
 			'Path'          => $this->path,
 			'Method'        => $this->method,
 			'Query'         => $this->query,
 			'Protocol'      => $this->protocol,
-			'ClientIP'      => $this->connection->getRemoteIp(),
+			'ClientIP'      => $this->getClientIp(),
 			'RequestSize'   => $this->requestSize,
 			'StartTime'     => String::formatMicroTime($this->startTime),
 			'RequestHeader' => $this->requestHeader,
@@ -251,14 +251,14 @@ class HttpProxy extends Proxy {
 	protected function responseStatistic()
 	{
 		
-		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['Path'] = $this->path;
-		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['StartTime'] = String::formatMicroTime($this->startTime);
-		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['EndTime'] = String::formatMicroTime(microtime(true));
-		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ServerIP'] = $this->asyncConnection->getRemoteIp();
-		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ResponseSize'] = $this->responseSize;
-		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ResponseCode'] = $this->responseCode;
-		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ResponseHeader'] = $this->responseHeader;
-		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ResponseBody'] = $this->responseBody;
+		static::$statisticData[$this->getClientIp()][$this->startTimeInt][$this->entityHost][$this->url]['Path'] = $this->path;
+		static::$statisticData[$this->getClientIp()][$this->startTimeInt][$this->entityHost][$this->url]['StartTime'] = String::formatMicroTime($this->startTime);
+		static::$statisticData[$this->getClientIp()][$this->startTimeInt][$this->entityHost][$this->url]['EndTime'] = String::formatMicroTime(microtime(true));
+		static::$statisticData[$this->getClientIp()][$this->startTimeInt][$this->entityHost][$this->url]['ServerIP'] = $this->getServerIp();
+		static::$statisticData[$this->getClientIp()][$this->startTimeInt][$this->entityHost][$this->url]['ResponseSize'] = $this->responseSize;
+		static::$statisticData[$this->getClientIp()][$this->startTimeInt][$this->entityHost][$this->url]['ResponseCode'] = $this->responseCode;
+		static::$statisticData[$this->getClientIp()][$this->startTimeInt][$this->entityHost][$this->url]['ResponseHeader'] = $this->responseHeader;
+		static::$statisticData[$this->getClientIp()][$this->startTimeInt][$this->entityHost][$this->url]['ResponseBody'] = $this->responseBody;
 	}
 
 	public function urlComponents($url)
@@ -303,5 +303,23 @@ class HttpProxy extends Proxy {
 		}
 
 		return true;
+	}
+
+	/**
+	 * 获取客户端IP
+	 * @return string
+	 */
+	public function getClientIp()
+	{
+		return $this->connection->getRemoteIp();
+	}
+
+	/**
+	 * 获取目标服务器IP
+	 * @return string
+	 */
+	public function getServerIp()
+	{
+		return $this->asyncConnection->getRemoteIp();
 	}
 }

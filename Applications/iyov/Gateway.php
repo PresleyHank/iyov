@@ -35,7 +35,11 @@ class Gateway {
 			return ;
 		}
 		foreach(static::$gatewayworker->connections as $connection) {
-			$connection->send(json_encode(self::$globalData));
+			if (!isset(self::$globalData[$connection->getRemoteIp()])) {
+				continue ;
+			}
+			$connection->send(json_encode(self::$globalData[$connection->getRemoteIp()]));
+			unset(static::$globalData[$connection->getRemoteIp()]);
 		}
 		self::$globalData = array();
 	}
@@ -48,7 +52,12 @@ class Gateway {
 			if (empty($data)) {
 				return ;
 			}
-			self::$globalData = self::$globalData + $data;
+			// self::$globalData = self::$globalData + $data;
+			foreach($data as $clientIp => $ipData) {
+				$tmp = !isset(static::$globalData[$clientIp]) ? $ipData : (static::$globalData[$clientIp] + $ipData);
+				ksort($tmp);
+				static::$globalData[$clientIp] = $tmp;
+			}
 		};
 		static::$internalWorker->listen();
 		static::$internalWorker->run();
