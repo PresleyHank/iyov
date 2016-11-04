@@ -18,7 +18,7 @@ class Proxy {
 	/**
 	 * udp address
 	 */
-	static $udpAddr = 'tcp://0.0.0.0:9388';
+	static $innerAddress = 'tcp://0.0.0.0:9388';
 	/**
 	 * 到统计进程的socket
 	 */
@@ -68,11 +68,12 @@ class Proxy {
 	public $protocol = '';
 	
 
+	/**
+	 * 初始化内部链接
+	 */
 	public static function init()
 	{
-		$stream = stream_socket_client('tcp://0.0.0.0:9388');
-
-		static::$innerConnection = new TcpConnection($stream, static::$innerConnection);
+		static::$innerConnection = new TcpConnection(stream_socket_client(self::$innerAddress), static::$innerConnection);
 	}
 
 	public static function instance($connection)
@@ -96,6 +97,9 @@ class Proxy {
 	 */
 	public static function Broadcast()
 	{
+		if (static::$innerConnection == null) {
+			self::init();
+		}
 		// 按时间排序
 		ksort(static::$statisticData);
 		static::$innerConnection->send(json_encode(static::$statisticData)); //JSON_UNESCAPED_SLASHES|

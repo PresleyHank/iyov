@@ -116,6 +116,8 @@ class HttpProxy extends Proxy {
 	* 代理流程入口
 	*
 	* @param string $buffer 客户端发来的第一个包
+	* @param string $flag   是否统计该请求数据
+	* @return void
 	*/
 	public function requestProcess($request)
 	{
@@ -159,13 +161,13 @@ class HttpProxy extends Proxy {
 	public function initClientCapture()
 	{
 		$proxy = $this;
-		$this->connection->onMessageCapture = function($data) use ($proxy) {
+		$this->connection->onMessageCapture = function($data) use (&$proxy) {
     		$proxy->data .= $data;
 			if (!($length = Http::input($proxy->data))) {
 				return ;
 			}
-			$request = substr($this->data, 0, $length);
-			$this->data = substr($this->data, $length, strlen($this->data));
+			$request = substr($proxy->data, 0, $length);
+			$proxy->data = substr($proxy->data, $length, strlen($proxy->data));
 			$proxy->requestProcess($request);
     	};
 	}
@@ -220,7 +222,6 @@ class HttpProxy extends Proxy {
 
 		$this->responseCode = "$status [ $message ]";
 		$this->responseBody = $this->getBody($body);
-		$this->responseHeader = str_replace("\r\n", "<br />", $this->responseHeader);
 	}
 
 	/**
@@ -257,7 +258,7 @@ class HttpProxy extends Proxy {
 		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ServerIP'] = $this->asyncConnection->getRemoteIp();
 		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ResponseSize'] = $this->responseSize;
 		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ResponseCode'] = $this->responseCode;
-		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ResponseHeader'] = $this->responseHeader;
+		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ResponseHeader'] = str_replace("\r\n", "<br />", $this->responseHeader);;
 		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ResponseBody'] = $this->responseBody;
 	}
 
@@ -274,34 +275,21 @@ class HttpProxy extends Proxy {
 		$this->url = $this->path == '/' ? 'default' : substr($this->path, 1, strlen($this->path));
 	}
 
-	protected function getBody($body)
+	protected function getBody($body = '')
 	{
-		if (!$this->validBody($this->responseHeader)) {
+		if ($body == '') {
+			return '[null]';
+		}
+		$contentType = Http::contentType($this->responseHeader);
+		if (!$contentType || !in_array($contentType, $this->acceptedContentType)) {
 			return '[unknown]';
+		}
+		
+		$contentEncoding = Http::contentEncoding($this->responseHeader);
+		if ($contentEncoding == 'gzip') {
+			$body = Http::unGzip($body);
 		}
 
 		return stripslashes(mb_convert_encoding($body, 'UTF-8', Http::$supportCharset));
-	}
-
-	protected function validBody($header)
-	{
-		return $this->validContentEncoding($header) & $this->validContentType($header);
-	}
-
-	
-
-	protected function validContentEncoding($header)
-	{
-		return !Http::contentEncoding($header);
-	}
-
-	protected function validContentType($header)
-	{
-		$contentType = Http::contentType($header);
-		if (!$contentType || !in_array($contentType, $this->acceptedContentType)) {
-			return false;
-		}
-
-		return true;
 	}
 }

@@ -21,16 +21,15 @@ class Http {
 
 		list($header, $body) = explode("\r\n\r\n", $data);
 		if (0 === strpos($header, "POST")) {
-            // find Content-Length
             $match = array();
             if (preg_match("/\r\nContent-Length: ?(\d+)/i", $header, $match)) {
                 $contentLength = $match[1];
                 if ($contentLength <= strlen($body)) {
                 	return strlen($header) + 4 + $contentLength;
                 }
-            } else {
                 return 0;
             }
+            return 0;
         }
 
         return strlen($header) + 4;
@@ -47,23 +46,21 @@ class Http {
 
 		list($header, $body) = explode("\r\n\r\n", $data, 2);
 		if (FALSE !== strpos($header, 'Transfer-Encoding: chunked')) {
-			// echo "\nchunked\n";
 			$spices = explode("\r\n", $body);
-			if (count($spices) < 3 && count($spices) % 2 != 1) {
-				// 最少包涵三个部分
+			for ($last = array_pop($spices); $last == "" && !empty($spices); $last = array_pop($spices)) {
+				continue;
+			}
+			if (!is_numeric($last) || $last != 0) {
 				return 0;
 			}
-			return array_pop($spices) != 0 ? 0 : strlen($header) + 4 + strlen($body);
+			return strlen($header) + 4 + strlen($body);
 		} else if (preg_match("/\r\nContent-Length: ?(\d+)/i", $header, $match)) {
-			// echo "find contentLength\n";
 			$contentLength = $match[1];
-			// echo "{$contentLength} => ".strlen($body)."\n";
 			if ($contentLength <= strlen($body)) {
 				return strlen($header) + 4 + $contentLength;
 			}
 			return 0;
 		}
-		// echo "\njust header\n";
         return strlen($header) + 4;
 		
 	}
@@ -92,5 +89,16 @@ class Http {
 		}
 
 		return "";
+	}
+
+	/**
+	 * Gzip解压缩
+	 * 
+	 * @param string $data
+	 * @return string
+	 */
+	public static function unGzip($data = '')
+	{
+		return ($data == '') ? '' : gzdecode(base64_decode($data));
 	}
 }

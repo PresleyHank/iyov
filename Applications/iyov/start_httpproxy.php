@@ -12,15 +12,12 @@ Autoloader::setRootPath(__DIR__);
 
 $httproxy_worker = new Worker('tcp://0.0.0.0:9733');
 
-$httproxy_worker->count = 5;
+$httproxy_worker->count = 1;
 
 $httproxy_worker->name = 'iyov-http-proxy';
 
 $httproxy_worker->onWorkerStart = function() {
-	HttpProxy::init();
-	Timer::add(1, function() {
-		HttpProxy::Broadcast();
-	}, array(), true);
+	Timer::add(1, array('\Applications\iyov\HttpProxy', 'Broadcast'), array(), true);
 };
 
 $httproxy_worker->onConnect = function($connection) {

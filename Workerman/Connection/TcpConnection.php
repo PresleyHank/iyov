@@ -523,7 +523,6 @@ class TcpConnection extends ConnectionInterface
         $source              = $this;
         $this->onMessage     = function ($source, $data) use ($dest) {
             $dest->send($data);
-            // echo $data."\n";
             call_user_func($source->onMessageCapture, $data);
         };
         $this->onClose       = function ($source) use ($dest) {

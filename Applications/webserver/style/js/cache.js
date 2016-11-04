@@ -6,7 +6,8 @@ var cache = {
 		if (data[id] == undefined) {
 			data[id] = {};
 		}
-		if (content['Query'] != "") {
+		console.log(content);
+		if (content['Query'] != undefined && content['Query'] != "") {
 			url = url + '?' + content['Query'];
 			delete content.Query;
 		}
