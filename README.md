@@ -16,6 +16,7 @@
 * 客户端第一个HTTP包可能没处理BUG;
 * 支持`Transfer-Encoding`字段;
 * 支持代理服务多进程；
+* 支持`Contetn-Encoding: gzip, inflate` 字段
 
 ### 安装
 * 克隆仓库，并把根目录重命名为Applications(Workerman 服务要求的，启动脚本只加载Applications下的启动文件)；
