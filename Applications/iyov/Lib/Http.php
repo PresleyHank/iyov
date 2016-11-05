@@ -95,10 +95,26 @@ class Http {
 	 * Gzip解压缩
 	 * 
 	 * @param string $data
+	 * @param bool   $chunked 是否为chunked传输
 	 * @return string
 	 */
-	public static function unGzip($data = '')
+	public static function unGzip($data = '', $chunked = false)
 	{
-		return ($data == '') ? '' : gzdecode($data);
+		if ($data == '') {
+			return '';
+		}
+
+		if ($chunked) {
+			$spices = explode("\r\n", $data);
+			$data = '';
+			foreach($spices as $index => $item) {
+				if ($item == "" || $index % 2 == 0) {
+					continue ;
+				}
+				$data .= $item;
+			}
+		}
+
+		return gzdecode($data);
 	}
 }

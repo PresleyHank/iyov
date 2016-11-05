@@ -205,7 +205,7 @@ class HttpProxy extends Proxy {
 		list($this->requestHeader, $body) = explode("\r\n\r\n", $data, 2);
 		list($firstLine, $this->requestHeader) = explode("\r\n", $this->requestHeader, 2);
 		list($this->method, $url, $this->protocol) = explode(" ", $firstLine);
-		
+
 		$this->requestBody = !$body ? '' : $body;
 		$this->urlComponents($url);
 	}
@@ -286,7 +286,7 @@ class HttpProxy extends Proxy {
 		
 		$contentEncoding = Http::contentEncoding($this->responseHeader);
 		if ($contentEncoding == 'gzip') {
-			$body = Http::unGzip($body);
+			$body = Http::unGzip($body, (bool)strpos($this->responseHeader, 'Transfer-Encoding: chunked'));
 		}
 
 		return stripslashes(mb_convert_encoding($body, 'UTF-8', Http::$supportCharset));
