@@ -203,11 +203,10 @@ class HttpProxy extends Proxy {
 	protected function requestDecode($data)
 	{
 		list($this->requestHeader, $body) = explode("\r\n\r\n", $data, 2);
-		$this->requestBody = !$body ? '' : $body;
 		list($firstLine, $this->requestHeader) = explode("\r\n", $this->requestHeader, 2);
-		$this->requestHeader = str_replace("\r\n", "<br />", $this->requestHeader);
-
 		list($this->method, $url, $this->protocol) = explode(" ", $firstLine);
+		
+		$this->requestBody = !$body ? '' : $body;
 		$this->urlComponents($url);
 	}
 
@@ -241,7 +240,7 @@ class HttpProxy extends Proxy {
 			'ClientIP'      => $this->connection->getRemoteIp(),
 			'RequestSize'   => $this->requestSize,
 			'StartTime'     => String::formatMicroTime($this->startTime),
-			'RequestHeader' => $this->requestHeader,
+			'RequestHeader' => str_replace("\r\n", "<br />", $this->requestHeader),
 			'RequestBody'   => $this->requestBody
 			);
 	}

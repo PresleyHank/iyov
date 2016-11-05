@@ -99,6 +99,6 @@ class Http {
 	 */
 	public static function unGzip($data = '')
 	{
-		return ($data == '') ? '' : gzdecode(base64_decode($data));
+		return ($data == '') ? '' : gzdecode($data);
 	}
 }
