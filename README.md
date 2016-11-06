@@ -19,7 +19,7 @@ of each `HTTP` request and response packages.
 * add `iyov.io ＝> 127.0.0.1` to your own hosts;
 * get into the root dir and run `php start.php start` command;
 
-### How to Use
+### How to use
 **Notice: If using iyov in your computer, app and computer should connect to the same network,otherwise it\`s workless.**
 
 1. set proxy config, `Address: computer local address`, `Port: 9733`
