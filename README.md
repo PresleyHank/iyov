@@ -19,8 +19,7 @@
 * 支持`Contetn-Encoding: gzip, inflate` 字段
 
 ### 安装
-* 克隆仓库，并把根目录重命名为Applications(Workerman 服务要求的，启动脚本只加载Applications下的启动文件)；
-* 在Applications同级目录下克隆Workerman源码；
+* 克隆仓库
 * 配置本地`hosts`：`iyov.io ＝> 127.0.0.1`;
 
 ### 使用
@@ -28,4 +27,5 @@
 > 打开HTTP代理，地址为本机`9733`端口
 #### PC端
 > 打开本地HTTP代理 
-## 浏览器地址：iyov.io:8080/iyov.html ##
+
+## 浏览器地址：iyov.io:8080 ##
