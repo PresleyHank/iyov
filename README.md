@@ -1,31 +1,27 @@
-#iyov
+#IYOV-A web proxy and analyze tool especially for app engineers.
 
-> HTTP 代理以及抓包工具
+### How it comes
+Sometimes we\`ll help colleagues to locate issues between app and servers. I have to login each server and dump the tcp packages, 
+but it\`s not that humanzied, or much ads. So I build this tool. It`s free and open to all developers. You can know every details 
+of each `HTTP` request and response packages.
 
-* Gateway 对外websocket服务
-* HttpProxy Http代理服务类，以及发送统计数据到Gateway进程，`TCP`协议
-* Proxy 代理基础类
-* Lib/Http Http 工具类
-* Lib/String 字符串工具类
 
-### FIXED & IMPROVED
-* 重构HttpProxy;
-* Response body 转码为编码UTF-8;
-* 统计数据上报改为TCP协议;
-* 统计数据结构可能造成信息被覆盖BUG;
-* 客户端第一个HTTP包可能没处理BUG;
-* 支持`Transfer-Encoding`字段;
-* 支持代理服务多进程；
-* 支持`Contetn-Encoding: gzip` 字段
+### Fitures
+* A proxy for http and https;
+* Support `Content-Length`;
+* Support `Transfer-Encoding: chunkded`;
+* Support `Content-Encoding: gzip`;
 
-### 安装
-* 克隆仓库
-* 配置本地`hosts`：`iyov.io ＝> 127.0.0.1`;
 
-### 使用
-#### 移动端
-> 打开HTTP代理，地址为本机`9733`端口
-#### PC端
-> 打开本地HTTP代理 
 
-## 浏览器地址：iyov.io:8080 ##
+### Install
+* clone this repository
+* add `iyov.io ＝> 127.0.0.1` to your own hosts;
+* get into the root dir and run `php start.php start` command;
+
+### How to Use
+**Notice: If using iyov in your computer, app and computer should connect to the same network,otherwise it\`s workless.**
+1. set proxy config, `Address: computer local address`, `Port: 9733`
+2. open iyov.io:8080 in browser
+
+Ok, Now you can surf the internet or test applications in mobile devices, every detail will be explosed in the tab.
