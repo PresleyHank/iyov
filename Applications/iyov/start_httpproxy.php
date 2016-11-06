@@ -25,7 +25,7 @@ $httproxy_worker->onConnect = function($connection) {
 };
 
 $httproxy_worker->onMessage = function($connection, $buffer) {
-	if (!HttpProxy::Instance($connection)->asyncConnection) {
+	if (!HttpProxy::Instance($connection)->asyncTcpConnection) {
 		HttpProxy::Instance($connection)->data .= $buffer;
 		if (!($length = Http::input(HttpProxy::Instance($connection)->data))) {
 			return ;
@@ -34,4 +34,8 @@ $httproxy_worker->onMessage = function($connection, $buffer) {
 		HttpProxy::Instance($connection)->requestProcess(HttpProxy::Instance($connection)->data);
 		HttpProxy::Instance($connection)->data = '';
 	}
+};
+
+$httproxy_worker->onClose = function($connection) {
+	HttpProxy::Instance($connection)->unInstance($connection);
 };

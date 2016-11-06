@@ -16,5 +16,5 @@ $gateway_worker->name = 'iyov-gateway';
 $gateway_worker->count = 1;
 
 $gateway_worker->onWorkerStart = function($gateway_worker) {
-	Gateway::init($gateway_worker);
+	Gateway::Init($gateway_worker);
 };

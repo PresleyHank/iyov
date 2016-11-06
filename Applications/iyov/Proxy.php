@@ -7,62 +7,62 @@ use \Workerman\Protocols\Http;
 
 
 /**
- * 代理类，父类
+ * 代理服务基类
  */
 class Proxy {
 
 	/**
+	 * 需要过滤掉的域名地址
 	 *
+	 * @var array
 	 */
 	public $filterHost = array('0.0.0.0:4355','iyov.io:8080');
+
 	/**
-	 * udp address
+	 * 统计进程地址
+	 *
+	 * @var string
 	 */
 	static $innerAddress = 'tcp://0.0.0.0:9388';
+
 	/**
-	 * 到统计进程的socket
+	 * 到统计进程的内容链接
+	 *
+	 * @param object
 	 */
 	protected static $innerConnection = null;
 
 	/**
 	 * 链接实例
 	 * 
-	 * @var array array(connection => HttpProxy)
+	 * @var array array(connection => proxyInstance)
 	 */
 	protected static $instances = array();
 
 	/**
-	 * 异步链接到代理实例的映射
-	 */
-	protected static $asyncConnToProxy = array();
-
-	/**
 	 * 客户端链接链接
+	 *
+	 * @var object
 	 */
 	public $connection = null;
 
 	/**
-	 * Http response Buffer
-	 */
-	public $responseBuffer = '';
-
-	/**
-	 * Http response content length
-	 */
-	public $responseContentLength = 0;
-
-	/**
-	 * Statistic data
+	 * 全局数据统计，并发送给统计进程
+	 *
+	 * @var array
 	 */
 	public static $statisticData = array();
 
 	/**
-	 * Request start time
+	 * 请求开始时间
+	 *
+	 * @var interge
 	 */
 	public $startTime = 0;
 
 	/**
 	 * 应用层协议
+	 *
 	 * @var string
 	 */
 	public $protocol = '';
@@ -75,6 +75,12 @@ class Proxy {
 		static::$innerConnection = new TcpConnection(stream_socket_client(self::$innerAddress), static::$innerConnection);
 	}
 
+	/**
+	 * 初始化代理实例
+	 *
+	 * @param object $connection
+	 * @return object Proxy
+	 */
 	public static function instance($connection)
 	{
 		if (!isset(static::$instances[$connection->id])) {
@@ -85,9 +91,13 @@ class Proxy {
 		return static::$instances[$connection->id];
 	}
 
-	public static function unsetInstance($connection)
+	/**
+	 * 销毁代理实例
+	 *
+	 * @param object $connection
+	 */
+	public static function unInstance($connection)
 	{
-		static::$instances[$connection->id]->AsyncTcpConnection->close();
 		unset(static::$instances[$connection->id]);
 	}
 
@@ -107,12 +117,16 @@ class Proxy {
 
 	/**
 	 * 解析
+	 *
 	 * @param string $data
 	 */
 	protected function decode($data) {}
 
 	/**
 	 * 过滤掉不统计的域名信息
+	 *
+	 * @param string $host
+	 * @return bool
 	 */
 	public function filter($host)
 	{

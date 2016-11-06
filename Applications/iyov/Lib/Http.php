@@ -93,7 +93,11 @@ class Http {
 
 	/**
 	 * Gzip解压缩
-	 * 
+	 * 补充说明：如果为chunkded，则需要特殊内容，chunked数据格式
+	 * [Chunk大小][回车][Chunk数据体][回车]...[0][回车][footer（可能有）][回车]
+	 * 0 表示数据体的结束，并不表示footer长度，如果有footer还有追加到数据缓存中
+	 * Chunk大小为16进制
+	 *
 	 * @param string $data
 	 * @param bool   $chunked 是否为chunked传输
 	 * @return string
@@ -105,14 +109,15 @@ class Http {
 		}
 
 		if ($chunked) {
-			$spices = explode("\r\n", $data);
-			$data = '';
-			foreach($spices as $index => $item) {
-				if ($item == "" || $index % 2 == 0) {
-					continue ;
-				}
-				$data .= $item;
+			$temp = '';
+			list($length16, $data) = explode("\r\n", $data, 2);
+			for (; hexdec($length16) != 0; list($length16, $data) = explode("\r\n", $data, 2)) {
+				$temp .= substr($data, 0, hexdec($length16));
+				// 2 表示去掉Chunk大小前的\r\n字符
+				$data = substr($data, hexdec($length16) + 2, strlen($data));
 			}
+			// 可能有footer存在
+			$data = trim($data, "\r\n") == "" ? $temp : $temp . substr($temp, 0, strlen($temp) - 2);
 		}
 
 		return gzdecode($data);
