@@ -98,19 +98,9 @@ class HttpProxy extends Proxy {
 	public $path = '/';
 
 	/**
-	 * Http 协议版本号
-	 */
-	public $protocol = '';
-
-	/**
 	 * Response start time.
 	 */
 	public $responseStartTime = 0;
-
-	public function __construct()
-	{
-		$this->protocol = 'Http';
-	}
 
 	/**
 	* 代理流程入口
@@ -130,7 +120,6 @@ class HttpProxy extends Proxy {
 			$this->initRemoteConnection();
 			$this->pipe($request);
 		}
-		// 解析请求数据
 		if ($this->filter("{$this->host}:{$this->port}")) {
 			return ;
 		}
@@ -162,6 +151,9 @@ class HttpProxy extends Proxy {
 	{
 		$proxy = $this;
 		$this->connection->onMessageCapture = function($data) use (&$proxy) {
+			if ($proxy->protocol == 'HTTPS') {
+				return ;
+			}
     		$proxy->data .= $data;
 			if (!($length = Http::input($proxy->data))) {
 				return ;
@@ -176,6 +168,9 @@ class HttpProxy extends Proxy {
 	{
     	$proxy = $this;
 		$this->asyncConnection->onMessageCapture = function($data) use (&$proxy) {
+			if ($proxy->protocol == 'HTTPS') {
+				return ;
+			}
 			$proxy->response .= $data;
 			if (!($length = Http::output($proxy->response))) {
 				return ;
@@ -189,10 +184,10 @@ class HttpProxy extends Proxy {
 	public function pipe($data)
 	{
 		if (strcmp($this->method,'CONNECT') === 0) {
-			// HTTPS
+			$this->protocol = 'HTTPS';
     		return $this->connection->send("HTTP/1.1 200 Connection Established\r\n\r\n");
     	}
-    	// HTTP
+
 		return $this->asyncConnection->send($data);
      	
 	}

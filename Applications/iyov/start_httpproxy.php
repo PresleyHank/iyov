@@ -12,7 +12,7 @@ Autoloader::setRootPath(__DIR__);
 
 $httproxy_worker = new Worker('tcp://0.0.0.0:9733');
 
-$httproxy_worker->count = 1;
+$httproxy_worker->count = 5;
 
 $httproxy_worker->name = 'iyov-http-proxy';
 

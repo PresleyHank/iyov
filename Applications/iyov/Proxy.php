@@ -62,11 +62,10 @@ class Proxy {
 	public $startTime = 0;
 
 	/**
-	 * 应用层协议，用于解包，生成统计数据
+	 * 应用层协议
 	 * @var string
 	 */
 	public $protocol = '';
-	
 
 	/**
 	 * 初始化内部链接
