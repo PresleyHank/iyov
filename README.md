@@ -2,7 +2,7 @@
 
 ### How it comes
 Sometimes we\`ll help colleagues to locate issues between app and servers. I have to login each server and dump the tcp packages, 
-but it\`s not that humanzied, or much ads. So I build this tool. It`s free and open to all developers. You can know every details 
+but it\`s not that humanzied, or much ads. So I build this tool. It\`s free and open to all developers. You can know every details 
 of each `HTTP` request and response packages.
 
 
@@ -21,6 +21,7 @@ of each `HTTP` request and response packages.
 
 ### How to Use
 **Notice: If using iyov in your computer, app and computer should connect to the same network,otherwise it\`s workless.**
+
 1. set proxy config, `Address: computer local address`, `Port: 9733`
 2. open iyov.io:8080 in browser
 
