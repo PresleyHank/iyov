@@ -23,6 +23,6 @@ of each `HTTP` request and response packages.
 **If using iyov in your computer, app and computer should connect to the same network,otherwise it\`s workless.**
 
 1. set proxy config, `Address: computer local address`, `Port: 9733`
-2. open iyov.io:8080 in browser
+2. open `iyov.io:8080` in browser
 
 Ok, Now you can surf the internet or test applications in mobile devices, every detail will be explosed in the tab.
