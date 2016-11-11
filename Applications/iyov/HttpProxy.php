@@ -155,7 +155,7 @@ class HttpProxy extends Proxy {
 			$this->initRemoteConnection();
 			$this->Pipe($request);
 		}
-		if ($this->filter("{$this->host}:{$this->port}")) {
+		if ($this->protocol == 'HTTPS' || $this->filter("{$this->host}:{$this->port}")) {
 			return ;
 		}
 		$this->requestStatistic();
@@ -305,7 +305,7 @@ class HttpProxy extends Proxy {
 			$body = Http::unGzip($body, (bool)strpos($this->responseHeader, 'Transfer-Encoding: chunked'));
 		}
 
-		// 转码为UTF-8，json_encode 仅支持UTF-8编码的数据
+		// json_encode 仅支持UTF-8编码的数据
 		return stripslashes(mb_convert_encoding($body, 'UTF-8', Http::$supportCharset));
 	}
 
