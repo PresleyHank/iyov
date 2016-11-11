@@ -3,7 +3,7 @@
 ### How it comes
 Sometimes we\`ll help colleagues to locate issues between app and servers. I have to login each server and dump the tcp packages, 
 but it\`s not that humanzied, or many ads. So I build this tool. It\`s free and open to all developers. You can know every details 
-of each `HTTP` request and response packages. Now it\`s avaliable in the [IYOV](http://iyov.io) cloud paltform, and I`m still working on 
+of each `HTTP` request and response packages. Now it\`s avaliable in the [IYOV](http://iyov.io) cloud platform, and I`m still working on 
 making it more easy to use.
 
 
