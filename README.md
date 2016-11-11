@@ -17,7 +17,7 @@ making it more easy to use.
 
 ### Install
 * clone this repository
-* add `iyov.io ＝> 127.0.0.1` to your own hosts;
+* add `test.iyov.io ＝> 127.0.0.1` to your own hosts;
 * get into the root dir and run `php start.php start` command;
 
 ### How to use
