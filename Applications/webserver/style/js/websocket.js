@@ -2,7 +2,7 @@
 
 var ws = {
 	init: function() {
-		ws.gateway = new WebSocket('ws://0.0.0.0:4355');
+		ws.gateway = new WebSocket('ws://test.iyov.io:4355');
 		console.log('ws init');
 		ws.gateway.onmessage = function(event) {
 			if (event.data == "") {

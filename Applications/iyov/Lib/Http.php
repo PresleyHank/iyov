@@ -12,6 +12,9 @@ class Http {
 	
 	/**
 	 * 检验请求包是否完整
+	 *
+	 * @param string $data
+	 * @return int
 	 */
 	public static function input($data)
 	{
@@ -37,6 +40,9 @@ class Http {
 
 	/**
 	 * 检查响应包是否完整
+	 *
+	 * @param string $data
+	 * @return int
 	 */
 	public static function output($data)
 	{
@@ -94,7 +100,7 @@ class Http {
 	/**
 	 * Gzip解压缩
 	 * 补充说明：如果为chunkded，则需要特殊内容，chunked数据格式
-	 * [Chunk大小][回车][Chunk数据体][回车]...[0][回车][footer（可能有）][回车]
+	 * [Chunk大小][\r\n][Chunk数据体][\r\n]...[0][\r\n][footer（可能有）][\r\n][\r\n]
 	 * 0 表示数据体的结束，并不表示footer长度，如果有footer还有追加到数据缓存中
 	 * Chunk大小为16进制
 	 *
