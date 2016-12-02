@@ -155,7 +155,7 @@ class HttpProxy extends Proxy {
 			$this->initRemoteConnection();
 			$this->Pipe($request);
 		}
-		if ($this->protocol == 'HTTPS' || $this->filter("{$this->host}:{$this->port}")) {
+		if ($this->protocol == 'HTTPS' || $this->filter($this->host)) {
 			return ;
 		}
 		$this->requestStatistic();
@@ -218,7 +218,7 @@ class HttpProxy extends Proxy {
 	{
     	$proxy = $this;
 		$this->asyncTcpConnection->onMessageCapture = function($data) use (&$proxy) {
-			if ($proxy->protocol == 'HTTPS') {
+			if ($proxy->protocol == 'HTTPS' || $proxy->filter($proxy->host)) {
 				return ;
 			}
 			$proxy->response .= $data;
