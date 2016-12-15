@@ -119,21 +119,29 @@ class HttpProxy extends Proxy {
 
 	/**
 	 * Http request body
+	 *
+	 * @var string
 	 */
 	public $requestBody;
 
 	/**
 	 * Http response body
+	 *
+	 * @var string
 	 */
 	public $responseBody;
 
 	/**
 	 * Http request path
+	 *
+	 * @var string
 	 */
 	public $path = '/';
 
 	/**
 	 * Response start time.
+	 *
+	 * @var string
 	 */
 	public $responseStartTime = 0;
 
