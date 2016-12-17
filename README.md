@@ -7,7 +7,7 @@ of each `HTTP` request and response packages. Now it\`s avaliable in the [IYOV](
 making it more easy to use.
 
 
-### Fitures
+### Features
 * A proxy for http and https;
 * Support `Content-Length`;
 * Support `Transfer-Encoding: chunkded`;
