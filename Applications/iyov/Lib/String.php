@@ -21,4 +21,15 @@ class String {
 		$spices = explode(".",  $time);
 		return count($spices) == 1 ? date('Y-m-d h:i:s', $spices[0]) : str_replace("x", $spices[1], date('Y-m-d h:i:s.x', $time));
 	}
+
+	/**
+	 * 找到 JSON 数据
+	 *
+	 * @param string $data
+	 * @return string
+	 */
+	public static function markJson($data = '')
+	{
+		return preg_replace('/\{(?:[^{}]|(?R))*\}/', '[JSON]${0}[/JSON]', $data);
+	}
 }

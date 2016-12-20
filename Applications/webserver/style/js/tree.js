@@ -89,7 +89,8 @@ var tree = {
 			if ($.inArray(type, newLineItem) == -1) {
 				item = ' :<span class="item-content">' + data[type] + '</span><br/>';
 			} else if (type == 'ResponseBody' || type == 'RequestBody') {
-				item = ' :<br/><br/><textarea class="' + (data[type] == "" ? 'empty' : 'not-empty') + '" readonly>' + data[type] + '</textarea>';
+				// item = ' :<br/><br/><pre class="' + (data[type] == "" ? 'empty' : 'not-empty') + '">' + data[type] + '</pre>';
+				item = ' :<br/><br/><pre><code>' + data[type] + '</code></pre>';
 			} else {
 				item = ' :<br/> <p class="item-content">' + data[type] + '</p>';
 			}
@@ -97,5 +98,8 @@ var tree = {
 		}
 		content = content != '' ? content : 'oh~ unexpected error happens...';
 		$("#iyov-content").html(content);
+		$('pre code').each(function(i, block) {
+    		hljs.highlightBlock(block);
+  		});
 	}
 }

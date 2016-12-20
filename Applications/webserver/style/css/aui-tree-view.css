@@ -138,16 +138,17 @@
     padding-left: 15px;
     padding-bottom: 15px;
 }
-#iyov-content > textarea {
+#iyov-content > pre {
 	width: 98%;
-	font-size: 12px;
-    background-color: ghostwhite;
-    border: none;
-    visibility: hidden;
+	/*font-size: 12px;*/
+    /*background-color: ghostwhite;*/
+    /*border: none;*/
+    /*visibility: hidden;*/
 }
-#iyov-content > textarea[class="not-empty"] {
-	height: 350px;
-	visibility: visible;
+#iyov-content > pre[class="not-empty"] {
+	/*height: 350px;*/
+	width: 98%;
+	/*visibility: visible;*/
 }
 .item-content {
 	margin-bottom: 0px;

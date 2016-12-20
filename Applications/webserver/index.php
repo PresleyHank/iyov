@@ -8,6 +8,10 @@
 <script type="text/javascript" src="style/js/websocket.js"></script>
 <script type="text/javascript" src="style/js/jquery.md5.js"></script>
 <script type="text/javascript" src="style/js/cache.js"></script>
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
+
 <script type="text/javascript">
 	tree.init();
 </script>

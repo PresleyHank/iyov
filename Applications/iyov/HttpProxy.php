@@ -163,7 +163,7 @@ class HttpProxy extends Proxy {
 			$this->initRemoteConnection();
 			$this->Pipe($request);
 		}
-		if ($this->protocol == 'HTTPS' || $this->filter($this->host)) {
+		if ($this->protocol == 'HTTPS' || $this->filter("{$this->host}:{$this->port}")) {
 			return ;
 		}
 		$this->requestStatistic();
@@ -268,7 +268,7 @@ class HttpProxy extends Proxy {
 		list($firstLine, $this->requestHeader) = explode("\r\n", $this->requestHeader, 2);
 		list($this->method, $url, $this->protocol) = explode(" ", $firstLine);
 
-		$this->requestBody = !$body ? '' : $body;
+		$this->requestBody = !$body ? '[null]' : $body;
 		$this->urlComponents($url);
 	}
 
@@ -330,7 +330,7 @@ class HttpProxy extends Proxy {
 		$this->scheme = isset($components['scheme']) ? $components['scheme'] : $this->scheme;
 		$this->port =  !isset($components['port']) ? '80' : $components['port'];
 		$this->path = !isset($components['path']) ? $this->path : $components['path'];
-		$this->host =  $this->port == 80 ? $this->host : $this->host . ':' . $this->port;
+		// $this->host =  $this->host . ':' . $this->port;
 		$this->query = !isset($components['query']) ? $this->query : $components['query'];
 		$this->entityHost = !$this->scheme ? $this->host : $this->scheme . '://' . $this->host;
 		$this->url = $this->path == '/' ? 'default' : substr($this->path, 1, strlen($this->path));
@@ -370,6 +370,7 @@ class HttpProxy extends Proxy {
 		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ResponseSize'] = $this->responseSize;
 		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ResponseCode'] = $this->responseCode;
 		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ResponseHeader'] = str_replace("\r\n", "<br />", $this->responseHeader);;
-		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ResponseBody'] = $this->responseBody;
+		// static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ResponseBody'] = htmlspecialchars(String::markJson($this->responseBody));
+		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ResponseBody'] = htmlspecialchars($this->responseBody);
 	}
 }
