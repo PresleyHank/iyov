@@ -11,7 +11,6 @@ var tree = {
 					id: 'root',
 					expanded: true,
 					label: 'iyov',
-					// icon: 'glyphicon glyphicon-cloud',
 					// cssClasses: 'normal',  //'{"normal":["glyphicon", "glyphicon-cloud"]}'
 					leaf: false,
 				}];
