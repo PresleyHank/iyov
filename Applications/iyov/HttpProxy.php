@@ -370,7 +370,6 @@ class HttpProxy extends Proxy {
 		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ResponseSize'] = $this->responseSize;
 		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ResponseCode'] = $this->responseCode;
 		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ResponseHeader'] = str_replace("\r\n", "<br />", $this->responseHeader);;
-		// static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ResponseBody'] = htmlspecialchars(String::markJson($this->responseBody));
 		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['ResponseBody'] = htmlspecialchars($this->responseBody);
 	}
 }
