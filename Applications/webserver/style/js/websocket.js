@@ -9,7 +9,6 @@ var ws = {
 				return ;
 			}
 			var package = eval('(' + event.data + ')');
-			console.log(package);
 			var hashHost ;
 			var data;
 			for(var time in package) {
@@ -28,7 +27,8 @@ var ws = {
 						holeUrl = url == 'default' ? host : host+'/'+url;
 						id = hash(holeUrl + '_t_' + time);
 						cache.set(id,  holeUrl, data[host][url]);
-						if ($("#iyov-content").children().length == 0) {
+						if ($("#iyov-content").children().length == 0 || cache.firstNode == id) {
+							cache.firstNode = id;
 							tree.showData(id);
 						}
 						if (data[host][url].hasOwnProperty('Path') && path(data[host][url]['Path'])) {

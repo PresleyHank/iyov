@@ -2,11 +2,12 @@
 var data = {};
 
 var cache = {
+	// 第一条数据
+	firstNode: "",
 	set: function(id, url, content) {
 		if (data[id] == undefined) {
 			data[id] = {};
 		}
-		console.log(content);
 		if (content['Query'] != undefined && content['Query'] != "") {
 			url = url + '?' + content['Query'];
 			delete content.Query;
