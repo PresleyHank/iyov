@@ -1,7 +1,7 @@
 // yui 
 var treeView = null;
 var firstDir = true;
-var newLineItem = ["RequestHeader","RequestBody","ResponseHeader","ResponseBody"];
+var newLineItem = ["Request Header","Request Body","Response Header","Response Body"];
 var tree = {
 	init: function() {
 		YUI().use(
@@ -86,7 +86,7 @@ var tree = {
 		for(var type in data) {
 			if ($.inArray(type, newLineItem) == -1) {
 				item = ' :<span class="item-content">' + data[type] + '</span><br/>';
-			} else if (type == 'ResponseBody' || type == 'RequestBody') {
+			} else if (type == 'Response Body' || type == 'Request Body') {
 				// item = ' :<br/><br/><pre class="' + (data[type] == "" ? 'empty' : 'not-empty') + '">' + data[type] + '</pre>';
 				item = ' :<br/><br/><pre><code>' + data[type] + '</code></pre>';
 			} else {

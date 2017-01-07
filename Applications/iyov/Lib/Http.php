@@ -8,7 +8,7 @@ class Http {
 	/**
 	 *
 	 */
-	public static $supportCharset = array('UTF-8','GBK');
+	public static $supportCharset = array('UTF-8','GBK', 'ISO-8859-1');
 	
 	/**
 	 * 检验请求包是否完整

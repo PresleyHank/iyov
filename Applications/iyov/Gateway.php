@@ -42,6 +42,8 @@ class Gateway {
 	public static function Broad()
 	{
 		if (empty(static::$gatewayworker->connections)) {
+			// 清空
+			self::$globalData = array();
 			return ;
 		}
 
