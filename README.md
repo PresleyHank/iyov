@@ -12,7 +12,9 @@ making it more easy to use.
 * Support `Content-Length`;
 * Support `Transfer-Encoding: chunkded`;
 * Support `Content-Encoding: gzip`;
-
+Example:
+ ![request](/Doc/Image/request.png)
+ ![response](/Doc/Image/response.png)
 
 
 ### Install
