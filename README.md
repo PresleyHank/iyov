@@ -12,7 +12,7 @@ making it more easy to use.
 * Support `Content-Length`;
 * Support `Transfer-Encoding: chunkded`;
 * Support `Content-Encoding: gzip`;
-Example:
+
  ![request](/Doc/Image/request.png)
  ![response](/Doc/Image/response.png)
 
@@ -25,7 +25,7 @@ Example:
 ### How to use
 **If using iyov in your computer, app and computer should connect to the same network,otherwise it\`s workless.**
 
-1. set proxy config, `Address: your computer local address`, `Port: 9733`
+1. set proxy config of mobile, `Address: your computer local address`, `Port: 9733`
 2. open `test.iyov.io:8080` in browser
 
 Ok, Now you can surf the internet or test applications in mobile devices, every detail will be explosed in the tab.
