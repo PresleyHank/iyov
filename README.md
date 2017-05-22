@@ -17,9 +17,9 @@ making it more easy to use.
  ![response](/Doc/Image/response.png)
 
 
-### Install
+### Installation
 * clone this repository
-* add `test.iyov.io ＝> 127.0.0.1` to your own hosts;
+* add `test.iyov.io    127.0.0.1` to your own hosts;
 * get into the root dir and run `php start.php start` command;
 
 ### How to use
