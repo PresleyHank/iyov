@@ -3,7 +3,7 @@
 namespace Applications\iyov;
 
 use Applications\iyov\Lib\Http;
-use Applications\iyov\Lib\String;
+use Applications\iyov\Lib\StringTool;
 use \Workerman\Connection\AsyncTcpConnection;
 
 /**
@@ -352,7 +352,7 @@ class HttpProxy extends Proxy {
 			'Protocol'      => $this->protocol,
 			'Client IP'      => $this->connection->getRemoteIp(),
 			'Request Size'   => $this->requestSize,
-			'Start Time'     => String::formatMicroTime($this->startTime),
+			'Start Time'     => StringTool::formatMicroTime($this->startTime),
 			'Request Header' => str_replace("\r\n", "<br />", $this->requestHeader),
 			'Request Body'   => $this->requestBody
 			);
@@ -364,8 +364,8 @@ class HttpProxy extends Proxy {
 	protected function responseStatistic()
 	{
 		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['Path'] = $this->path;
-		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['Start Time'] = String::formatMicroTime($this->startTime);
-		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['End Time'] = String::formatMicroTime(microtime(true));
+		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['Start Time'] = StringTool::formatMicroTime($this->startTime);
+		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['End Time'] = StringTool::formatMicroTime(microtime(true));
 		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['Server IP'] = $this->asyncTcpConnection->getRemoteIp();
 		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['Response Size'] = $this->responseSize;
 		static::$statisticData[$this->startTimeInt][$this->entityHost][$this->url]['Response Code'] = $this->responseCode;
