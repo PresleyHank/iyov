@@ -12,9 +12,9 @@ $web = new WebServer("http://" . Config::get('Iyov.Web.host') . ":" . Config::ge
 $web->count = 4;
 
 // Set the root of domains
-array_walk(Config::get('Iyov.Web.domain'), function($domain) use (&$web) {
+foreach(Config::get('Iyov.Web.domain') as $domain) {
     $web->addRoot($domain, __DIR__);
-});
+};
 
 // run all workers
 Worker::runAll();
