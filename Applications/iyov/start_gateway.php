@@ -3,13 +3,15 @@
 use \Workerman\Worker;
 use \Workerman\Autoloader;
 use \Applications\iyov\Gateway;
-use \Workerman\Lib\Timer;
+use \Applications\Lib\Config;
+
+Config::setNameSpace('Applications\Config');
 
 // 自动加载类
 require_once __DIR__ . '/../../Workerman/Autoloader.php';
 Autoloader::setRootPath(__DIR__);
 
-$gateway_worker = new Worker('websocket://0.0.0.0:4355');
+$gateway_worker = new Worker('websocket://' . Config::get('Iyov.Gateway.host') . ':' . Config::get('Iyov.Gateway.port'));
 
 $gateway_worker->name = 'iyov-gateway';
 
